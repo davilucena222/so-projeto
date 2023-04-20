@@ -1,19 +1,21 @@
 class RoundRobin:
 
-    def processData(self, no_of_processes):
+    def processData(self, lines):
         process_data = []
-        for i in range(no_of_processes):
+        for i, line in enumerate(lines):
             temporary = []
-            process_id = int(input("Enter Process ID: "))
+            # process_id = int(input("Enter Process ID: "))
 
-            arrival_time = int(input(f"Enter Arrival Time for Process {process_id}: "))
+            # arrival_time = int(input(f"Enter Arrival Time for Process {process_id}: "))
 
-            burst_time = int(input(f"Enter Burst Time for Process {process_id}: "))
+            # burst_time = int(input(f"Enter Burst Time for Process {process_id}: "))
 
-            temporary.extend([process_id, arrival_time, burst_time, 0, burst_time])
+            arrival_time, burst_time = line.split()
+
+            temporary.extend([i + 1, int(arrival_time), int(burst_time), 0, int(burst_time)])
             process_data.append(temporary)
 
-        time_slice = int(input("Enter Time Slice: "))
+        time_slice = 2
 
         RoundRobin.schedulingProcess(self, process_data, time_slice)
 
@@ -163,8 +165,9 @@ class RoundRobin:
 
 
 if __name__ == "__main__":
-    no_of_processes = int(input("Enter number of processes: "))
+    with open("processos.txt", "r") as f:
+        lines = f.readlines()
+    no_of_processes = len(lines)
+
     rr = RoundRobin()
-    rr.processData(no_of_processes)
-
-
+    rr.processData(lines)

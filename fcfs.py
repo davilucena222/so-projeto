@@ -23,7 +23,8 @@ class FCFS:
             process_data[i].append(e_time)
         t_time = FCFS.calculateTurnaroundTime(self, process_data)
         w_time = FCFS.calculateWaitingTime(self, process_data)
-        FCFS.printData(self, process_data, t_time, w_time)
+        r_time = FCFS.calculateResponseTime(self, process_data, start_time)
+        FCFS.printData(self, process_data, t_time, w_time, r_time)
 
     def calculateTurnaroundTime(self, process_data):
         total_turnaround_time = 0
@@ -45,9 +46,19 @@ class FCFS:
 
         return average_waiting_time
 
-    def printData(self, process_data, average_turnaround_time, average_waiting_time):
+    def calculateResponseTime(self, process_data, start_time):
+        total_response_time = 0
+        for i in range(len(process_data)):
+            response_time = start_time[i] - process_data[i][1]
+            total_response_time = total_response_time + response_time
+            process_data[i].append(response_time)
+        average_response_time = total_response_time / len(process_data)
 
-        print("Process_ID  Arrival_Time  Burst_Time  Completion_Time  Turnaround_Time  Waiting_Time")
+        return average_response_time
+
+    def printData(self, process_data, average_turnaround_time, average_waiting_time, average_response_time):
+
+        print("Process_ID  Arrival_Time  Burst_Time  Completion_Time  Turnaround_Time  Waiting_Time  Response_Time")
 
         for i in range(len(process_data)):
             for j in range(len(process_data[i])):
@@ -57,6 +68,8 @@ class FCFS:
         print(f'Average Turnaround Time: {average_turnaround_time}')
 
         print(f'Average Waiting Time: {average_waiting_time}')
+
+        print(f'Average Response Time: {average_response_time}')
 
 if __name__ == "__main__":
     with open("processos.txt", "r") as f:

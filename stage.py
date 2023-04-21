@@ -1,15 +1,10 @@
 class FCFS:
-    def processData(self, no_of_processes):
+    def processData(self, lines):
         process_data = []
-        for i in range(no_of_processes):
+        for i, line in enumerate(lines):
             temporary = []
-            process_id = int(input("Enter Process ID: "))
-
-            arrival_time = int(input("Enter Arrival Time: "))
-
-            burst_time = int(input(f"Enter Burst Time for Process {process_id}: "))
-
-            temporary.extend([process_id, arrival_time, burst_time])
+            arrival_time, burst_time = line.split()
+            temporary.extend([i+1, int(arrival_time), int(burst_time)])
             process_data.append(temporary)
         FCFS.schedulingProcess(self, process_data)
 
@@ -64,8 +59,9 @@ class FCFS:
         print(f'Average Waiting Time: {average_waiting_time}')
 
 if __name__ == "__main__":
-    
-    no_of_processes = int(input("Enter number of processes: "))
+    with open("processos.txt", "r") as f:
+        lines = f.readlines()
+    no_of_processes = len(lines)
 
     fcfs = FCFS()
-    fcfs.processData(no_of_processes)
+    fcfs.processData(lines)

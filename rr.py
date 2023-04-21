@@ -4,19 +4,11 @@ class RoundRobin:
         process_data = []
         for i, line in enumerate(lines):
             temporary = []
-            # process_id = int(input("Enter Process ID: "))
-
-            # arrival_time = int(input(f"Enter Arrival Time for Process {process_id}: "))
-
-            # burst_time = int(input(f"Enter Burst Time for Process {process_id}: "))
-
             arrival_time, burst_time = line.split()
-
             temporary.extend([i + 1, int(arrival_time), int(burst_time), 0, int(burst_time)])
             process_data.append(temporary)
 
         time_slice = 2
-
         RoundRobin.schedulingProcess(self, process_data, time_slice)
 
     def schedulingProcess(self, process_data, time_slice):
@@ -26,6 +18,7 @@ class RoundRobin:
         ready_queue = []
         s_time = 0
         process_data.sort(key=lambda x: x[1])
+        
         '''
         Sort processes according to the Arrival Time
         '''

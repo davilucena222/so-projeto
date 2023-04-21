@@ -1,166 +1,58 @@
-class RoundRobin:
+if __name__ == '__main__':
+    # Python program for implementation of RR Scheduling
+    print("Enter Total Process Number: ")
+    total_p_no = int(input())
+    total_time = 0 
+    total_time_counted = 0
+    # proc is process list
+    proc = []
+    wait_time = 0
+    response_time = 0 # new variable to keep track of response time
+    turnaround_time = 0
+    for _ in range(total_p_no):
+        # Getting the input for process
+        print("Enter process arrival time and burst time") 
+        input_info = list(map(int, input().split(" ")))
+        arrival, burst, remaining_time = input_info[0], input_info[1], input_info[1]
+        # processes are appended to the proc list in following format
+        proc.append([arrival, burst, remaining_time, 0, 0]) # new element for start time
+        # total_time gets incremented with burst time of each process
+        total_time += burst
+    print("Enter time quantum")
+    time_quantum = int(input())
+    # Keep traversing in round robin manner until the total_time == 0
+    while total_time != 0:
+        # traverse all the processes
+        for i in range(len(proc)):
+            # proc[i][2] here refers to remaining_time for each process i.e "i"
+            if proc[i][2] <= time_quantum and proc[i][2] >= 0:
+                total_time_counted += proc[i][2]
+                total_time -= proc[i][2]
+                # the process has completely ended here thus setting it's remaining time to 0.
+                proc[i][2] = 0 
+                if proc[i][3] == 0:
+                    # if process has not started yet, set start time
+                    proc[i][4] = total_time_counted - proc[i][1] # start time = current time - burst time
+                    proc[i][3] = 1 # flag to indicate start time has been set
+            elif proc[i][2] > 0:
+                # if process has not finished, decrementing it's remaining time by time_quantum
+                proc[i][2] -= time_quantum
+                total_time -= time_quantum
+                total_time_counted += time_quantum
+                if proc[i][3] == 0:
+                    # if process has not started yet, set start time
+                    proc[i][4] = total_time_counted - time_quantum # start time = current time - quantum
+                    proc[i][3] = 1 # flag to indicate start time has been set
+            if proc[i][2] == 0 and proc[i][3] != 2:
+                # if remaining time of process is 0
+                # and 
+                # individual waiting time of process has not been calculated i.e flag
+                wait_time += total_time_counted - proc[i][0] - proc[i][1]
+                response_time += proc[i][4] - proc[i][0] # calculating response time
+                turnaround_time += total_time_counted - proc[i][0] # calculating turnaround time
+                proc[i][3] = 2 # flag to indicate that waiting time has been calculated
 
-    def processData(self, lines):
-        process_data = []
-        for i, line in enumerate(lines):
-            temporary = []
-            arrival_time, burst_time = line.split()
-            temporary.extend([i + 1, int(arrival_time), int(burst_time), 0, int(burst_time)])
-            process_data.append(temporary)
-
-        time_slice = 2
-        RoundRobin.schedulingProcess(self, process_data, time_slice)
-
-    def schedulingProcess(self, process_data, time_slice):
-        start_time = []
-        exit_time = []
-        executed_process = []
-        ready_queue = []
-        s_time = 0
-        process_data.sort(key=lambda x: x[1])
-        
-        '''
-        Sort processes according to the Arrival Time
-        '''
-        while 1:
-            normal_queue = []
-            temp = []
-            for i in range(len(process_data)):
-                if process_data[i][1] <= s_time and process_data[i][3] == 0:
-                    present = 0
-                    if len(ready_queue) != 0:
-                        for k in range(len(ready_queue)):
-                            if process_data[i][0] == ready_queue[k][0]:
-                                present = 1
-                    '''
-                    The above if loop checks that the next process is not a part of ready_queue
-                    '''
-                    if present == 0:
-                        temp.extend([process_data[i][0], process_data[i][1], process_data[i][2], process_data[i][4]])
-                        ready_queue.append(temp)
-                        temp = []
-                    '''
-                    The above if loop adds a process to the ready_queue only if it is not already present in it
-                    '''
-                    if len(ready_queue) != 0 and len(executed_process) != 0:
-                        for k in range(len(ready_queue)):
-                            if ready_queue[k][0] == executed_process[len(executed_process) - 1]:
-                                ready_queue.insert((len(ready_queue) - 1), ready_queue.pop(k))
-                    '''
-                    The above if loop makes sure that the recently executed process is appended at the end of ready_queue
-                    '''
-                elif process_data[i][3] == 0:
-                    temp.extend([process_data[i][0], process_data[i][1], process_data[i][2], process_data[i][4]])
-                    normal_queue.append(temp)
-                    temp = []
-            if len(ready_queue) == 0 and len(normal_queue) == 0:
-                break
-            if len(ready_queue) != 0:
-                if ready_queue[0][2] > time_slice:
-                    '''
-                    If process has remaining burst time greater than the time slice, it will execute for a time period equal to time slice and then switch
-                    '''
-                    start_time.append(s_time)
-                    s_time = s_time + time_slice
-                    e_time = s_time
-                    exit_time.append(e_time)
-                    executed_process.append(ready_queue[0][0])
-                    for j in range(len(process_data)):
-                        if process_data[j][0] == ready_queue[0][0]:
-                            break
-                    process_data[j][2] = process_data[j][2] - time_slice
-                    ready_queue.pop(0)
-                elif ready_queue[0][2] <= time_slice:
-                    '''
-                    If a process has a remaining burst time less than or equal to time slice, it will complete its execution
-                    '''
-                    start_time.append(s_time)
-                    s_time = s_time + ready_queue[0][2]
-                    e_time = s_time
-                    exit_time.append(e_time)
-                    executed_process.append(ready_queue[0][0])
-                    for j in range(len(process_data)):
-                        if process_data[j][0] == ready_queue[0][0]:
-                            break
-                    process_data[j][2] = 0
-                    process_data[j][3] = 1
-                    process_data[j].append(e_time)
-                    ready_queue.pop(0)
-            elif len(ready_queue) == 0:
-                if s_time < normal_queue[0][1]:
-                    s_time = normal_queue[0][1]
-                if normal_queue[0][2] > time_slice:
-                    '''
-                    If process has remaining burst time greater than the time slice, it will execute for a time period equal to time slice and then switch
-                    '''
-                    start_time.append(s_time)
-                    s_time = s_time + time_slice
-                    e_time = s_time
-                    exit_time.append(e_time)
-                    executed_process.append(normal_queue[0][0])
-                    for j in range(len(process_data)):
-                        if process_data[j][0] == normal_queue[0][0]:
-                            break
-                    process_data[j][2] = process_data[j][2] - time_slice
-                elif normal_queue[0][2] <= time_slice:
-                    '''
-                    If a process has a remaining burst time less than or equal to time slice, it will complete its execution
-                    '''
-                    start_time.append(s_time)
-                    s_time = s_time + normal_queue[0][2]
-                    e_time = s_time
-                    exit_time.append(e_time)
-                    executed_process.append(normal_queue[0][0])
-                    for j in range(len(process_data)):
-                        if process_data[j][0] == normal_queue[0][0]:
-                            break
-                    process_data[j][2] = 0
-                    process_data[j][3] = 1
-                    process_data[j].append(e_time)
-        t_time = RoundRobin.calculateTurnaroundTime(self, process_data)
-        w_time = RoundRobin.calculateWaitingTime(self, process_data)
-        RoundRobin.printData(self, t_time, w_time, executed_process)
-
-    def calculateTurnaroundTime(self, process_data):
-        total_turnaround_time = 0
-        for i in range(len(process_data)):
-            turnaround_time = process_data[i][5] - process_data[i][1]
-            '''
-            turnaround_time = completion_time - arrival_time
-            '''
-            total_turnaround_time = total_turnaround_time + turnaround_time
-            process_data[i].append(turnaround_time)
-        average_turnaround_time = total_turnaround_time / len(process_data)
-        '''
-        average_turnaround_time = total_turnaround_time / no_of_processes
-        '''
-        return average_turnaround_time
-
-    def calculateWaitingTime(self, process_data):
-        total_waiting_time = 0
-        for i in range(len(process_data)):
-            waiting_time = process_data[i][6] - process_data[i][4]
-            '''
-            waiting_time = turnaround_time - burst_time
-            '''
-            total_waiting_time = total_waiting_time + waiting_time
-            process_data[i].append(waiting_time)
-        average_waiting_time = total_waiting_time / len(process_data)
-        '''
-        average_waiting_time = total_waiting_time / no_of_processes
-        '''
-        return average_waiting_time
-
-    def printData(self, average_turnaround_time, average_waiting_time, executed_process):
-        print(f'Average Turnaround Time: {average_turnaround_time}')
-        print(f'Average Waiting Time: {average_waiting_time}')
-        print(f'Sequence of Processes: {executed_process}')
-
-
-if __name__ == "__main__":
-    with open("processos.txt", "r") as f:
-        lines = f.readlines()
-    no_of_processes = len(lines)
-
-    rr = RoundRobin()
-    rr.processData(lines)
+    # Output
+    print("\nAverage Waiting Time: ", (wait_time * 1.0 / total_p_no) + 1)
+    print("Average Response Time: ", (response_time * 1.0 / total_p_no) + 1)
+    print("Average Turnaround Time: ", (turnaround_time * 1.0 / total_p_no) + 1)

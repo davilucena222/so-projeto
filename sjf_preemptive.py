@@ -78,7 +78,47 @@ rt.pop(-1)
 burst_times.pop(-1)
 arrival_times.pop(-1)
 
-print("SJF - SHORTEST JOB FIRST:")
+print("SJF - SHORTEST JOB FIRST - PREEMPTIVE:")
 print('Average Waiting Time = ', sum(wt)/len(wt))
 print('Average Turnaround Time = ', sum(tat)/len(tat))
 print('Average Response Time = ', sum(rt)/len(rt))
+
+
+# print("SFJ - SHORTEST JOB FIRST - Non-Preemptive")
+# with open('processos.txt') as f:
+#     lines = f.readlines()
+
+# bt = []
+# for i, line in enumerate(lines):
+#     at, bt_i = map(int, line.strip().split())
+#     bt.append((at, bt_i, i))
+
+# bt.sort()
+
+# n = len(bt)
+# ct = [0] * n
+# tat = [0] * n
+# wt = [0] * n
+# rt = [0] * n
+
+# t = 0
+# while bt:
+#     available_processes = [p for p in bt if p[0] <= t]
+#     if not available_processes:
+#         t += 1
+#         continue
+#     next_process = min(available_processes, key=lambda p: p[1])
+#     bt.remove(next_process)
+#     at, bt_i, i = next_process
+#     ct[i] = t + bt_i
+#     tat[i] = ct[i] - at
+#     wt[i] = tat[i] - bt_i
+#     rt[i] = t - at
+#     t = ct[i]
+
+# for i, p in enumerate(bt):
+#     at, bt_i, _ = p
+#     print(f'P{i}\t{at}\t{bt_i}\t{ct[i]}\t{tat[i]}\t{wt[i]}\t{rt[i]}')
+# print(f'Tempo de Retorno Médio: {sum(tat)/n:.1f}')
+# print(f'Tempo de Resposta Médio: {sum(rt)/n:.1f}')
+# print(f'Tempo de Espera Médio: {sum(wt)/n:.1f}')

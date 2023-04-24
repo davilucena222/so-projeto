@@ -1,4 +1,8 @@
             ################################# ALGORITMO FCFS ########################################
+# abrindo arquivo de leitura
+with open("processos.txt", "r") as f:
+    lines = f.readlines()
+no_of_processes = len(lines)
 
 # esta função recebe uma lista de processos
 def processData(lines):
@@ -82,28 +86,18 @@ def printData(average_turnaround_time, average_waiting_time, average_response_ti
     print(f'Average Waiting Time: {average_waiting_time}')
     print(f'Average Response Time: {average_response_time}')
 
-# abrindo arquivo de leitura
-with open("processos.txt", "r") as f:
-    lines = f.readlines()
-no_of_processes = len(lines)
 
+# chamada da função processData para inicializar o algoritmo
 processData(lines)
 
             ################################# ALGORITMO SJF ########################################
 
-# abrindo arquivo para leitura
-with open('processos.txt', 'r') as f:
-    lines = f.readlines()
-
-lengthLine = len(lines) # Obtém o tamanho da lista 
-
-
 # cria 3 listas todas com o tamanho da lista de processos e inicializa com 0
-burst_times = [0] * (lengthLine + 1)
-arrival_times = [0] * (lengthLine + 1)
-process_info = [0] * (lengthLine + 1)
+burst_times = [0] * (no_of_processes + 1)
+arrival_times = [0] * (no_of_processes + 1)
+process_info = [0] * (no_of_processes + 1)
 
-for i, line in zip(range(lengthLine), lines): # percorre as linhas do arquivo e preenche as listas de tempo de chegada, tempo de burst e informações do processo
+for i, line in zip(range(no_of_processes), lines): # percorre as linhas do arquivo e preenche as listas de tempo de chegada, tempo de burst e informações do processo
     
     arrivalTime, burstTime = line.split() # separa a linha atual em tempo de chegada e tempo de burst
     burst_times[i] = int(burstTime) # converte o tempo de burst em um inteiro e armazena na lista burst_times
@@ -138,12 +132,11 @@ for i in range(0, sum(burst_times)): # loop para simular o escalonamento dos pro
             t = process_info.pop(process_info.index(k))
             ll.append([k, i + 1])
 
-
 # cria uma lista com tamanho igual ao número de processos + 1, para armazenar os valores de cada processo
-ct = [0] * (lengthLine + 1)  # Tempo de conclusão de cada processo
-tat = [0] * (lengthLine + 1)  # Tempo de retorno de cada processo
-wt = [0] * (lengthLine + 1)  # Tempo de espera de cada processo
-rt = [0] * (lengthLine + 1)  # Tempo de resposta de cada processo
+ct = [0] * (no_of_processes + 1)  # Tempo de conclusão de cada processo
+tat = [0] * (no_of_processes + 1)  # Tempo de retorno de cada processo
+wt = [0] * (no_of_processes + 1)  # Tempo de espera de cada processo
+rt = [0] * (no_of_processes + 1)  # Tempo de resposta de cada processo
 
 # atualiza a lista ct com o tempo de conclusão de cada processo
 for i in ll:

@@ -1,0 +1,20 @@
+    # queue = [ 
+        #    ['pid': C, 'arrival_time': 4, 'burst_time': 6, 'remaining_time': 6, 'start_time': None, 'finish_time': None, 'response_time': None],
+        #    ['pid': D, 'arrival_time': 4, 'burst_time': 8, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': None],
+        #    ['pid': B, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 8, 'start_time': 2, 'finish_time': None, 'response_time': 2],
+        # ]
+
+        # process = [
+            # ['pid': A, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 20, 'start_time': None, 'finish_time': None, 'response_time': None],
+            # ['pid': B, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 10, 'start_time': None, 'finish_time': None, 'response_time': None],
+            # ['pid': C, 'arrival_time': 4, 'burst_time': 6, 'remaining_time': 6, 'start_time': None, 'finish_time': None, 'response_time': None],
+            # ['pid': D, 'arrival_time': 4, 'burst_time': 8, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': None],
+        # ]
+        # p = ['pid': A, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 18, 'start_time': 0, 'finish_time': None, 'response_time': 0]
+
+        process = [
+            ['pid': 4, 'arrival_time': 4, 'burst_time': 8, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': None],
+            ['pid': 3, 'arrival_time': 4, 'burst_time': 6, 'remaining_time': 6, 'start_time': None, 'finish_time': None, 'response_time': None],
+            ['pid': 2, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 10, 'start_time': None, 'finish_time': None, 'response_time': None],
+            ['pid': 1, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 20, 'start_time': None, 'finish_time': None, 'response_time': None],
+        ]

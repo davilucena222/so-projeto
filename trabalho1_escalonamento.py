@@ -1,4 +1,4 @@
-            ################################# ALGORITMO FCFS ########################################
+            ################################# ALGORITMO FCFS (COMPLETO) ########################################
 # abrindo arquivo de leitura
 with open("processos.txt", "r") as f:
     lines = f.readlines()
@@ -90,7 +90,7 @@ def printData(average_turnaround_time, average_waiting_time, average_response_ti
 # chamada da função processData para inicializar o algoritmo
 processData(lines)
 
-            ################################# ALGORITMO SJF ########################################
+            ################################# ALGORITMO SJF (DECIDIR SE É PREEMPTIVO OU NÃO) ########################################
 
 # cria 3 listas todas com o tamanho da lista de processos e inicializa com 0
 burst_times = [0] * (no_of_processes + 1)
@@ -162,7 +162,7 @@ print('Average Waiting Time = ', sum(wt)/len(wt))
 print('Average Turnaround Time = ', sum(tat)/len(tat))
 print('Average Response Time = ', sum(rt)/len(rt))
 
-        ################################# ALGORITMO ROUND ROBIN ########################################   
+        ################################# ALGORITMO ROUND ROBIN (AJEITANDO...) ########################################   
         
 print("")
 print("ROUND ROBIN - QUANTUM 2")

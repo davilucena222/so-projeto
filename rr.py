@@ -1,10 +1,9 @@
 print("")
 print("ROUND ROBIN - QUANTUM 2")
 
-def execute_process(p, current_time): # p = ['pid': 1, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 18, 'start_time': None, 'finish_time': None, 'response_time': 0]
-    start_time = current_time # start_time = 4
+def execute_process(p, current_time): # ['pid': B, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 8, 'start_time': 2, 'finish_time': None, 'response_time': 2],
+    start_time = current_time # start_time = 2
 
-    # só entra uma vez para atribuir o tempo de inicio a cada processo (facilita o cálculo do tempo médio de resposta: tempo de inicio - tempo de chegada)
     if p['start_time'] is None:
         p['start_time'] = start_time
 
@@ -15,48 +14,57 @@ def execute_process(p, current_time): # p = ['pid': 1, 'arrival_time': 0, 'burst
         finish_time = current_time + p['remaining_time']
         p['remaining_time'] = 0
     else: 
-        finish_time = current_time + 2 # finish_time = 6
+        finish_time = current_time + 2  # finish_time = 4
         p['remaining_time'] -= 2
 
     return finish_time
 
-# função que verifica se o tempo restante de execução do projeto foi finalizado
 def is_completed(p):
     return p['remaining_time'] == 0
 
 
 def round_robin(processes):
-    n = len(processes) # n = 4
+    n = len(processes) 
     current_time = 0  
     queue = []
     completed_processes = []
+    partial = []
 
-    while len(completed_processes) < n: # 0 < 4
-        # process = [
-            # ['pid': 1, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 20, 'start_time': None, 'finish_time': None, 'response_time': None],
-            # ['pid': 2, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 10, 'start_time': None, 'finish_time': None, 'response_time': None],
-            # ['pid': 3, 'arrival_time': 4, 'burst_time': 6, 'remaining_time': 6, 'start_time': None, 'finish_time': None, 'response_time': None],
-            # ['pid': 4, 'arrival_time': 4, 'burst_time': 8, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': None],
-        # ]
+    # ordenando processos pelo tempo de chegada
+    # processes = sorted(processes, key=lambda p: p['arrival_time'])
+    # print("ordenado: ", processes)
 
-        for p in processes: # current_time = 4
-            if p['arrival_time'] <= current_time and p not in queue and not is_completed(p): # process <= current_time = 4
-                queue.append(p) 
+    while len(completed_processes) < n:
 
-        print(queue)   
-
-        # queue = [
-        #     ['pid': 2, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': 2]
-        #     ['pid': 3, 'arrival_time': 4, 'burst_time': 6, 'remaining_time': 6, 'start_time': None, 'finish_time': None, 'response_time': None],
-        #     ['pid': 4, 'arrival_time': 4, 'burst_time': 8, 'remaining_time': 8, 'start_time': None, 'finish_time': None, 'response_time': None],
-        # ]
+        if len(processes) != 0: 
+            for p in processes:
+                if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
+                    queue.append(p)
+                    processes.remove(p)
 
         if not queue:
             current_time += 1
             continue
         
-        p = queue.pop(0) # p = ['pid': 1, 'arrival_time': 0, 'burst_time': 20, 'remaining_time': 18, 'start_time': None, 'finish_time': None, 'response_time': 0],
-        finish_time = execute_process(p, current_time) # execute_process(p, 4), finish_time = 4
+        p = queue.pop(0)  
+        finish_time = execute_process(p, current_time) 
+
+        if len(processes) != 0:
+            for processo in processes:
+                if processo['arrival_time'] <= finish_time and processo not in queue and not is_completed(p):
+                    partial.append(processo)
+                    processes.remove(processo)
+
+        print("partial: ", partial)
+        
+        j = 0
+
+        if len(partial) != 0:
+            while len(partial) != 0:
+                proc = partial.pop(0)
+                if proc:
+                    queue.insert(j, proc)
+                    j += 1
 
         if is_completed(p): 
             p['finish_time'] = finish_time
@@ -64,10 +72,9 @@ def round_robin(processes):
         else:
             queue.append(p)
 
-        current_time = finish_time # current_time = 4
+        current_time = finish_time
 
     return completed_processes
-
 
 # execução do main
 if __name__ == '__main__':
@@ -80,7 +87,6 @@ if __name__ == '__main__':
             processes.append({'pid': i+1, 'arrival_time': arrival_time, 'burst_time': burst_time, 'remaining_time': burst_time, 'start_time': None, 'finish_time': None, 'response_time': None})
 
     completed_processes = round_robin(processes)
-    print(completed_processes)
 
     tat = [p['finish_time'] - p['arrival_time'] for p in completed_processes]
     wt = [p['finish_time'] - p['arrival_time'] - p['burst_time'] for p in completed_processes]

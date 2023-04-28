@@ -1,8 +1,8 @@
 print("")
 print("ROUND ROBIN - QUANTUM 2")
 
-def execute_process(p, current_time): # ['pid': B, 'arrival_time': 0, 'burst_time': 10, 'remaining_time': 8, 'start_time': 2, 'finish_time': None, 'response_time': 2],
-    start_time = current_time # start_time = 2
+def execute_process(p, current_time): 
+    start_time = current_time 
 
     if p['start_time'] is None:
         p['start_time'] = start_time
@@ -14,7 +14,7 @@ def execute_process(p, current_time): # ['pid': B, 'arrival_time': 0, 'burst_tim
         finish_time = current_time + p['remaining_time']
         p['remaining_time'] = 0
     else: 
-        finish_time = current_time + 2  # finish_time = 4
+        finish_time = current_time + 2 
         p['remaining_time'] -= 2
 
     return finish_time
@@ -28,24 +28,37 @@ def round_robin(processes):
     current_time = 0  
     queue = []
     completed_processes = []
-    partial = []
-
-    # ordenando processos pelo tempo de chegada
-    # processes = sorted(processes, key=lambda p: p['arrival_time'])
-    # print("ordenado: ", processes)
+    procExec = []
 
     while len(completed_processes) < n:
+        print("")
+        print("fila: ", queue)
+        print("")
 
-        for p in processes:
-            if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
-                queue.append(p)
-                # processes.remove(p)
+        if len(queue) > 0:
+            procExec.append(queue.pop(0))
 
-        if not queue:
-            current_time += 1
-            continue
-        
-        p = queue.pop(0)  
+        j = 0
+
+        if len(processes) > 0:
+            for p in processes:
+                if len(queue) > 0 and current_time > 0:
+                    print("cheguei")
+                    if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
+                        queue.insert(j, p)
+                        processes.remove(p)
+
+                if p and p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
+                    queue.append(p) 
+                    processes.remove(p)
+                
+                j = j + 1
+
+        # if not queue:
+            # current_time += 1
+            # continue
+
+        p = procExec.pop(0) if len(procExec) > 0 else queue.pop(0) 
         finish_time = execute_process(p, current_time) 
 
         if is_completed(p): 

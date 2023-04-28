@@ -36,11 +36,10 @@ def round_robin(processes):
 
     while len(completed_processes) < n:
 
-        if len(processes) != 0: 
-            for p in processes:
-                if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
-                    queue.append(p)
-                    processes.remove(p)
+        for p in processes:
+            if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
+                queue.append(p)
+                # processes.remove(p)
 
         if not queue:
             current_time += 1
@@ -48,23 +47,6 @@ def round_robin(processes):
         
         p = queue.pop(0)  
         finish_time = execute_process(p, current_time) 
-
-        if len(processes) != 0:
-            for processo in processes:
-                if processo['arrival_time'] <= finish_time and processo not in queue and not is_completed(p):
-                    partial.append(processo)
-                    processes.remove(processo)
-
-        print("partial: ", partial)
-        
-        j = 0
-
-        if len(partial) != 0:
-            while len(partial) != 0:
-                proc = partial.pop(0)
-                if proc:
-                    queue.insert(j, proc)
-                    j += 1
 
         if is_completed(p): 
             p['finish_time'] = finish_time

@@ -32,6 +32,7 @@ def round_robin(processes):
 
     while len(completed_processes) < n:
         print("")
+        print("tamanho da fila: ", len(queue)) # []
         print("fila: ", queue)
         print("")
 
@@ -40,25 +41,27 @@ def round_robin(processes):
 
         j = 0
 
-        if len(processes) > 0:
+        if len(processes) > 0: # [p1(0, 20), p2(0, 10), p3(4, 6), p4(4, 8)]
             for p in processes:
                 if len(queue) > 0 and current_time > 0:
-                    print("cheguei")
                     if p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
                         queue.insert(j, p)
-                        processes.remove(p)
+                        # processes.remove(p)
+                elif p and p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
+                    queue.append(p) # [p1(0, 20)]
+                    # processes.remove(p)
 
-                if p and p['arrival_time'] <= current_time and p not in queue and not is_completed(p):
-                    queue.append(p) 
-                    processes.remove(p)
-                
                 j = j + 1
+
+        if len(queue) > 0:
+            for p in queue:
+                if 
 
         # if not queue:
             # current_time += 1
             # continue
 
-        p = procExec.pop(0) if len(procExec) > 0 else queue.pop(0) 
+        p = procExec.pop(0) if len(procExec) > 0 else queue.pop(0) # p = , queue = [p2(10), p1(18)], proExec = []
         finish_time = execute_process(p, current_time) 
 
         if is_completed(p): 

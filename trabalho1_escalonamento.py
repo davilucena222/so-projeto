@@ -81,178 +81,168 @@ def calculateResponseTime(process_data, start_time):
 
 # função para imprimir os tempos 
 def printData(average_turnaround_time, average_waiting_time, average_response_time):
+    print("")
     print("FIRST COME FIRST SERVE ALGORITHM")
-    print(f'Average Turnaround Time: {average_turnaround_time:.1f}')
-    print(f'Average Waiting Time: {average_waiting_time:.1f}')
-    print(f'Average Response Time: {average_response_time:.1f}')
+    print("")
+    print(f'Tempo de retorno médio: {average_turnaround_time:.1f}')
+    print(f'Tempo de resposta médio: {average_response_time:.1f}')
+    print(f'Tempo de espera médio: {average_waiting_time:.1f}')
 
 
 # chamada da função processData para inicializar o algoritmo
 processData(lines)
 
-            ################################# ALGORITMO SJF (DECIDIR SE É PREEMPTIVO OU NÃO) ########################################
-
-# cria 3 listas todas com o tamanho da lista de processos e inicializa com 0
-burst_times = [0] * (no_of_processes + 1)
-arrival_times = [0] * (no_of_processes + 1)
-process_info = [0] * (no_of_processes + 1)
-
-for i, line in zip(range(no_of_processes), lines): # percorre as linhas do arquivo e preenche as listas de tempo de chegada, tempo de burst e informações do processo
-    
-    arrivalTime, burstTime = line.split() # separa a linha atual em tempo de chegada e tempo de burst
-    burst_times[i] = int(burstTime) # converte o tempo de burst em um inteiro e armazena na lista burst_times
-    arrival_times[i] = int(arrivalTime) # converte o tempo de chegada em um inteiro e armazena na lista arrival_times
-    process_info[i] = [burst_times[i], arrival_times[i], i] # cria uma lista com informações do processo, contendo tempo de burst, tempo de chegada e índice do processo, e armazena na lista process_info
-
-process_info.pop(-1) # remove o último elemento da lista process_info, que foi inicializado com valor zero
-sumbt = 0 # variável sumbt com valor zero, será usada para armazenar a soma dos tempos de execução
-i = 0 # variável i com valor zero, será o índice do processo atual
-ll = [] # cria uma lista vazia chamada que será usada para armazenar os processos que já foram executados
-
-# copia a lista arrival_times para a lista start_times
-start_times = arrival_times.copy()
-
-for i in range(0, sum(burst_times)): # loop para simular o escalonamento dos processos
-    l = [] # cria uma lista vazia para armazenar os processos que chegaram até o tempo atual 
-
-    # loop para adicionar na lista l os processos que já chegaram
-    for j in process_info:
-        if j[1] <= i: 
-            l.append(j)
-
-    l.sort(key=lambda x: x[0]) # ordena a lista l pelo tempo de burst, do menor para o maior
-    process_info[process_info.index(l[0])][0] -= 1  # decrementa em 1 unidade o tempo de execução do primeiro processo na lista l
-
-    for j in process_info: # atualiza a lista start_times para o processo que teve o tempo de execução decrementado, caso seja seu primeiro decremento
-        if j[0] == burst_times[j[2]]:
-            start_times[j[2]] = i + 1
-
-    for k in process_info: # remove da lista process_info os processos que terminaram de executar e adiciona na lista ll
-        if k[0] == 0:
-            t = process_info.pop(process_info.index(k))
-            ll.append([k, i + 1])
-
-# cria uma lista com tamanho igual ao número de processos + 1, para armazenar os valores de cada processo
-ct = [0] * (no_of_processes + 1)  # Tempo de conclusão de cada processo
-tat = [0] * (no_of_processes + 1)  # Tempo de retorno de cada processo
-wt = [0] * (no_of_processes + 1)  # Tempo de espera de cada processo
-rt = [0] * (no_of_processes + 1)  # Tempo de resposta de cada processo
-
-# atualiza a lista ct com o tempo de conclusão de cada processo
-for i in ll:
-    ct[i[0][2]] = i[1]
-
-# calcula as métricas de desempenho para cada processo
-for i in range(len(ct)):
-    tat[i] = ct[i] - arrival_times[i]  # tempo de retorno é o tempo de conclusão menos o tempo de chegada
-    wt[i] = tat[i] - burst_times[i]   # tempo de espera é o tempo de retorno menos o tempo de execução
-    rt[i] = start_times[i] - arrival_times[i]  # tempo de resposta é o tempo em que o processo começa a ser executado menos o tempo de chegada
-
-# remove o último elemento de cada lista, que não corresponde a um processo
-ct.pop(-1)
-wt.pop(-1)
-tat.pop(-1)
-rt.pop(-1)
-burst_times.pop(-1)
-arrival_times.pop(-1)
+            ################################# ALGORITMO SJF NÃO PREEMPETIVO ########################################
 
 print("")
-print("SJF - SHORTEST JOB FIRST - PREEMPTIVE:")
-print('Average Waiting Time = ', sum(wt)/len(wt))
-print('Average Turnaround Time = ', sum(tat)/len(tat))
-print('Average Response Time = ', sum(rt)/len(rt))
+print("SFJ - SHORTEST JOB FIRST - Non-Preemptive")
+print("")
+# with open('processos.txt') as f:
+#     lines = f.readlines()
+
+bt = []
+for i, line in enumerate(lines):
+    at, bt_i = map(int, line.strip().split())
+    bt.append((at, bt_i, i))
+
+bt.sort()
+
+n = len(bt)
+ct = [0] * no_of_processes
+tat = [0] * no_of_processes
+wt = [0] * no_of_processes
+rt = [0] * no_of_processes
+
+t = 0
+while bt:
+    available_processes = [p for p in bt if p[0] <= t]
+    if not available_processes:
+        t += 1
+        continue
+    next_process = min(available_processes, key=lambda p: p[1])
+    bt.remove(next_process)
+    at, bt_i, i = next_process
+    ct[i] = t + bt_i
+    tat[i] = ct[i] - at
+    wt[i] = tat[i] - bt_i
+    rt[i] = t - at
+    t = ct[i]
+
+for i, p in enumerate(bt):
+    at, bt_i, _ = p
+    print(f'P{i}\t{at}\t{bt_i}\t{ct[i]}\t{tat[i]}\t{wt[i]}\t{rt[i]}')
+    
+print(f'Tempo de Retorno Médio: {sum(tat)/no_of_processes:.1f}')
+print(f'Tempo de Resposta Médio: {sum(rt)/no_of_processes:.1f}')
+print(f'Tempo de Espera Médio: {sum(wt)/no_of_processes:.1f}')
 
         ################################# ALGORITMO ROUND ROBIN (AJEITANDO...) ########################################   
         
+# with open("processos.txt", "r") as arquivo:
+#   linhas = arquivo.readlines()
+  
+processos = []
+j = 0
+for linha in lines:
+  tempo_de_chegada, tempo_de_execucao = map(int, linha.strip().split())
+  
+  j += 1
+
+  processos.append({
+    "pid": j,
+    "tempo_de_chegada": tempo_de_chegada,
+    "tempo_de_execucao": tempo_de_execucao,
+    "tempo_restante": tempo_de_execucao,
+    "tempo_de_inicio": None,
+    "tempo_de_finalizacao": None,
+    "tempo_de_resposta": None,
+    "tempo_de_espera": None
+  })
+
+def executa_processo(processo, tempo_atual):
+  tempo_corrido = tempo_atual
+
+  if processo["tempo_de_inicio"] == None:
+    processo["tempo_de_inicio"] = tempo_atual
+
+  if processo["tempo_restante"] > 2:
+    processo["tempo_restante"] = processo["tempo_restante"] - 2
+    tempo_corrido = tempo_corrido + 2
+    
+    if processo["tempo_de_resposta"] == None:
+      processo["tempo_de_resposta"] = tempo_corrido
+
+  elif processo["tempo_restante"] == 1:
+    processo["tempo_restante"] = processo["tempo_restante"] - 1
+    processo["tempo_restante"] = 0
+    tempo_corrido = tempo_corrido + 1
+    processo["tempo_de_finalizacao"] = tempo_corrido
+  elif processo["tempo_restante"] == 2:
+    processo["tempo_restante"] = processo["tempo_restante"] - 2
+    processo["tempo_restante"] = 0
+    tempo_corrido = tempo_corrido + 2
+    processo["tempo_de_finalizacao"] = tempo_corrido
+  
+  return tempo_corrido
+
+processos.sort(key = lambda x: x["tempo_de_chegada"])
+
+fila_de_espera = []
+processos_encerrados = []
+primeiros_processos = []
+tempo_atual = 0
+tempo_de_espera = 0
+tempo_de_resposta = 0
+num_processos = len(processos)
+tempo_de_chegada_primeiro_processo = processos[0]["tempo_de_chegada"]
+
+while len(processos_encerrados) < num_processos:
+  if len(processos) > 0:
+    for processo_executa in processos:
+      if processo_executa["tempo_de_chegada"] <= tempo_atual and processo_executa not in fila_de_espera and not processo_executa["tempo_restante"] == 0:
+        fila_de_espera.append(processo_executa)
+
+      if tempo_atual == tempo_de_chegada_primeiro_processo and processo_executa["tempo_de_chegada"] == tempo_de_chegada_primeiro_processo:
+        primeiros_processos.append(processo_executa)
+
+  if len(fila_de_espera) == 0:
+    tempo_atual = tempo_atual + 1
+    continue
+
+  processo = fila_de_espera.pop(0)
+  tempo_final = executa_processo(processo, tempo_atual)
+
+  if len(processos) > 0:
+    for novo_processo in processos:
+      if novo_processo["tempo_de_chegada"] <= tempo_final and novo_processo not in fila_de_espera and not novo_processo["tempo_restante"] == 0 and not novo_processo["pid"] == processo["pid"]:
+        fila_de_espera.append(novo_processo)
+
+  if len(fila_de_espera) > 0:
+    for proc in fila_de_espera:
+
+      if proc["tempo_de_espera"] == None and proc["tempo_de_chegada"] == tempo_de_chegada_primeiro_processo and proc in primeiros_processos and proc["tempo_de_resposta"] != None:
+        proc["tempo_de_espera"] = tempo_final - tempo_atual
+      elif proc["tempo_de_espera"] == None:
+        proc["tempo_de_espera"] = tempo_final - proc["tempo_de_chegada"]
+      else:
+        proc["tempo_de_espera"] = proc["tempo_de_espera"] + (tempo_final - tempo_atual)
+
+  if processo["tempo_restante"] == 0:
+    if processo["tempo_de_espera"] == None:
+      processo["tempo_de_espera"] = 0
+    processos_encerrados.append(processo)
+  else:
+    fila_de_espera.append(processo)
+    
+  tempo_atual = tempo_final
+
+tempo_medio_de_retorno = [pp1["tempo_de_finalizacao"] - pp1["tempo_de_chegada"] for pp1 in processos_encerrados]
+tempo_medio_de_resposta = [pp2["tempo_de_inicio"] - pp2["tempo_de_chegada"] for pp2 in processos_encerrados]
+tempo_medio_espera = [pp3["tempo_de_espera"] for pp3 in processos_encerrados]
+
 print("")
-print("ROUND ROBIN - QUANTUM 2")
-class Process:
-    # construtor da classe "Process", que recebe um identificador (pid), tempo de chegada (arrival_time) e tempo de burst (burst_time)
-    def __init__(self, pid, arrival_time, burst_time):
-        self.pid = pid # atribui o identificador do processo
-        self.arrival_time = arrival_time # atribui o tempo de chegada do processo
-        self.burst_time = burst_time # atribui o tempo de burst do processo
-        self.remaining_time = burst_time # inicializa o tempo restante do processo com o tempo de burst
-        self.start_time = None # inicializa o tempo de início do processo como nulo
-        self.finish_time = None # inicializa o tempo de término do processo como nulo
-        self.response_time = None # inicializa o tempo de resposta do processo como nulo
-    
-    # simula a execução do processo por um período de tempo "quantum"
-    def execute(self, current_time):
-        self.start_time = current_time # atribui o tempo de início do processo como o tempo atual
-        if self.response_time is None: # verifica se o tempo de resposta do processo é nulo
-            # calcula o tempo de resposta do processo como a diferença entre o tempo de início e o tempo de chegada
-            self.response_time = self.start_time - self.arrival_time
-
-        if self.remaining_time <= 2: # verifica se o tempo restante do processo é menor ou igual a 2 
-            # atribui o tempo de término do processo como o tempo atual mais o tempo restante
-            self.finish_time = current_time + self.remaining_time
-            self.remaining_time = 0 # zera o tempo restante do processo
-        else: 
-            # se não, atribui o tempo de término do processo como o tempo atual mais 2 (o valor do quantum)
-            self.finish_time = current_time + 2
-            self.remaining_time -= 2 # decrementa o tempo restante do processo em 2 (o valor do quantum)
-
-        return self.finish_time # retorna o tempo de término do processo
-    
-    def is_completed(self): # verifica se o processo já foi completamente executado
-        return self.remaining_time == 0  # retorna verdadeiro se o tempo restante do processo for igual a zero, falso caso contrário
-
-def round_robin(processes):
-    n = len(processes) # armazena a quantidade de processos na variável "n"
-    current_time = 0 # define o tempo corrente como 0
-    queue = [] # inicializa a fila de processos como vazia
-    completed_processes = [] # inicializa a lista de processos completados como vazia
-
-    # enquanto a lista de processos completos for menor que a quantidade de processos
-    while len(completed_processes) < n:
-        for p in processes: 
-            # se o tempo de chegada do processo "p" for menor ou igual ao tempo corrente, e o processo "p" não estiver na fila, e o processo "p" não tiver sido concluído, então adiciona o processo "p" na fila
-            if p.arrival_time <= current_time and p not in queue and not p.is_completed():
-                queue.append(p)
-                
-        if not queue: # se a fila de processos estiver vazia
-            current_time += 1 # incrementa o tempo corrente em 1 e continua o loop
-            continue
-        p = queue.pop(0) # remove o primeiro processo da fila e armazena na variável "p"
-        finish_time = p.execute(current_time) # executa o processo "p" a partir do tempo corrente 
-        if p.is_completed():
-            p.finish_time = finish_time # armazena o tempo de conclusão do processo "p"
-            completed_processes.append(p) # adiciona o processo "p" à lista de processos completos
-        else:
-            queue.append(p) # adiciona o processo "p" de volta à fila
-
-        # atualiza o tempo corrente com o tempo de conclusão do processo "p"
-        current_time = finish_time 
-
-    # retorna a lista de processos completos
-    return completed_processes
-
-
-if __name__ == '__main__':
-    with open('processos.txt', 'r') as f: # abre o arquivo "processos.txt" para leitura
-        lines = f.readlines() # armazena as linhas do arquivo na variável "lines"
-        processes = []
-        for i, line in enumerate(lines): # percorre cada linha do arquivo
-            arrival_time, burst_time = map(int, line.strip().split()) # armazena o tempo de chegada e o tempo de burst do processo na variável "arrival_time" e "burst_time"
-            processes.append(Process(i+1, arrival_time, burst_time)) # adiciona o processo na lista de processos e os seus respectivos tempos de chegada e de execução
-    completed_processes = round_robin(processes)  # chamando a função round robin passando a lista de processos 
-
-    # calcula o tempo de retorno de cada processo
-    tat = [p.finish_time - p.arrival_time for p in completed_processes] 
-
-    # calcula o tempo de espera de cada processo
-    wt = [p.finish_time - p.arrival_time - p.burst_time for p in completed_processes] 
-
-    # calcula o tempo de resposta de cada processo
-    rt = [p.response_time for p in completed_processes] 
-
-    # armazena a quantidade de processos na variável "n"
-    n = len(completed_processes) 
-
-    avg_tat = sum(tat) / n # calcula o tempo de retorno médio
-    avg_wt = sum(wt) / n # calcula o tempo de espera médio
-    avg_rt = sum(rt) / n # calcula o tempo de resposta médio
-    print(f'Tempo de retorno médio: {avg_tat:.1f}')
-    print(f'Tempo de resposta médio: {avg_rt:.1f}')
-    print(f'Tempo de espera médio: {avg_wt:.1f}')
+print("ROUND ROBIN QUANTUM 2")
+print("")
+print(f"Tempo médio de retorno: {sum(tempo_medio_de_retorno) / len(tempo_medio_de_retorno):.1f}")
+print(f"Tempo médio de resposta: {sum(tempo_medio_de_resposta) / len(tempo_medio_de_resposta):.1f}")
+print(f"Tempo médio de espera: {sum(tempo_medio_espera) / len(tempo_medio_espera):.1f}")

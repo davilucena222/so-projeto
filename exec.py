@@ -56,6 +56,10 @@ tempo_atual = 0
 tempo_de_espera = 0
 tempo_de_resposta = 0
 num_processos = len(processos)
+tempo_de_chegada_primeiro_processo = processos[0]["tempo_de_chegada"]
+print("")
+print("TEMPO DE CHEGADA DO PRIMEIRO PROCESSO: ", tempo_de_chegada_primeiro_processo)
+print("")
 
 while len(processos_encerrados) < num_processos:
   if len(processos) > 0:
@@ -66,10 +70,20 @@ while len(processos_encerrados) < num_processos:
 
       if processo_executa["tempo_de_chegada"] <= tempo_atual and processo_executa not in fila_de_espera and not processo_executa["tempo_restante"] == 0:
         fila_de_espera.append(processo_executa)
+        print("")
+        print("fila dentro do primeiro for: ", fila_de_espera)
+        print("")
         # processos.pop(0)
 
-      if tempo_atual == 0 and processo_executa["tempo_de_chegada"] == 0:
+      if tempo_atual == tempo_de_chegada_primeiro_processo and processo_executa["tempo_de_chegada"] == tempo_de_chegada_primeiro_processo:
         primeiros_processos.append(processo_executa)
+
+  if len(fila_de_espera) == 0:
+    tempo_atual = tempo_atual + 1
+    print("")
+    print("tempo atual (sem processos): ", tempo_atual)
+    print("")
+    continue
 
 
   print("")
@@ -84,12 +98,13 @@ while len(processos_encerrados) < num_processos:
   print("")
 
 
-  i = 0
+  # i = 0
 
   if len(processos) > 0:
     for novo_processo in processos:
       print("")
       print("Processo do for 2: ", novo_processo)
+
       if novo_processo["tempo_de_chegada"] <= tempo_final and novo_processo not in fila_de_espera and not novo_processo["tempo_restante"] == 0 and not novo_processo["pid"] == processo["pid"]:
         # fila_de_espera.insert(i, novo_processo)
         fila_de_espera.append(novo_processo)
@@ -100,8 +115,9 @@ while len(processos_encerrados) < num_processos:
     for proc in fila_de_espera:
       # result = tempo_final - tempo_atual
 
-      if proc["tempo_de_espera"] == None and proc["tempo_de_chegada"] == 0 and proc in primeiros_processos and proc["tempo_de_resposta"] != None:
-        proc["tempo_de_espera"] = tempo_final - proc["tempo_de_chegada"] - proc["tempo_de_resposta"]
+      if proc["tempo_de_espera"] == None and proc["tempo_de_chegada"] == tempo_de_chegada_primeiro_processo and proc in primeiros_processos and proc["tempo_de_resposta"] != None:
+        proc["tempo_de_espera"] = tempo_final - tempo_atual
+        # proc["tempo_de_espera"] = tempo_final - proc["tempo_de_chegada"] - proc["tempo_de_resposta"] + tempo_de_chegada_primeiro_processo
       elif proc["tempo_de_espera"] == None:
         proc["tempo_de_espera"] = tempo_final - proc["tempo_de_chegada"]
       else:
@@ -112,6 +128,8 @@ while len(processos_encerrados) < num_processos:
   print("")
 
   if processo["tempo_restante"] == 0:
+    if processo["tempo_de_espera"] == None:
+      processo["tempo_de_espera"] = 0
     processos_encerrados.append(processo)
   else:
     fila_de_espera.append(processo)
@@ -125,10 +143,6 @@ tempo_medio_de_retorno = [pp1["tempo_de_finalizacao"] - pp1["tempo_de_chegada"] 
 tempo_medio_de_resposta = [pp2["tempo_de_inicio"] - pp2["tempo_de_chegada"] for pp2 in processos_encerrados]
 tempo_medio_espera = [pp3["tempo_de_espera"] for pp3 in processos_encerrados]
 
-print(f"Tempo médio de retorno: {sum(tempo_medio_de_retorno) / len(tempo_medio_de_retorno)}")
-print(f"Tempo médio de resposta: {sum(tempo_medio_de_resposta) / len(tempo_medio_de_resposta)}")
-print(f"Tempo médio de espera: {sum(tempo_medio_espera) / len(tempo_medio_espera)}")
-
-# print(tempo_medio_de_retorno)
-# print(tempo_medio_de_resposta)
-# print(tempo_medio_espera)
+print(f"Tempo médio de retorno: {sum(tempo_medio_de_retorno) / len(tempo_medio_de_retorno):.1f}")
+print(f"Tempo médio de resposta: {sum(tempo_medio_de_resposta) / len(tempo_medio_de_resposta):.1f}")
+print(f"Tempo médio de espera: {sum(tempo_medio_espera) / len(tempo_medio_espera):.1f}")

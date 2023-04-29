@@ -82,9 +82,9 @@ def calculateResponseTime(process_data, start_time):
 # função para imprimir os tempos 
 def printData(average_turnaround_time, average_waiting_time, average_response_time):
     print("FIRST COME FIRST SERVE ALGORITHM")
-    print(f'Average Turnaround Time: {average_turnaround_time}')
-    print(f'Average Waiting Time: {average_waiting_time}')
-    print(f'Average Response Time: {average_response_time}')
+    print(f'Average Turnaround Time: {average_turnaround_time:.1f}')
+    print(f'Average Waiting Time: {average_waiting_time:.1f}')
+    print(f'Average Response Time: {average_response_time:.1f}')
 
 
 # chamada da função processData para inicializar o algoritmo

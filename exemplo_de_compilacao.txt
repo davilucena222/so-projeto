@@ -1,0 +1,2 @@
+- Funciona em Linux e Windows (se tiver o python instalado no windows)
+   - python3 escalonamento_de_processos.py
